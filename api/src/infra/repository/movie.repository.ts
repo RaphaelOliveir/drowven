@@ -1,6 +1,5 @@
 export class MovieRepository {
-
-    async search(title: string) {
-        return [];
-    }
+  async search(_title: string) {
+    return [];
+  }
 }
