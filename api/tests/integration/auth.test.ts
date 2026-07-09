@@ -33,6 +33,26 @@ describe('POST /api/v1/auth/register', () => {
     expect(res.body.data.password_hash).toBeUndefined(); // Should not return password hash
   });
 
+  it('creates a user with areas and returns 201 with the new user including areas', async () => {
+    const res = await request
+      .post(`${BASE}/register`)
+      .send({
+        name: 'Bob',
+        email: 'bob@example.com',
+        password: 'password123',
+        areas: ['Engineering', 'Information Technology (IT)']
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.name).toBe('Bob');
+    expect(res.body.data.areas).toBeDefined();
+    expect(res.body.data.areas).toHaveLength(2);
+    expect(res.body.data.areas).toEqual(
+      expect.arrayContaining(['Engineering', 'Information Technology (IT)'])
+    );
+  });
+
   it('returns 409 when email is already in use', async () => {
     await request
       .post(`${BASE}/register`)

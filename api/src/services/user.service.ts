@@ -43,6 +43,22 @@ export async function createUser(dto: CreateUserDto): Promise<User> {
     [dto.name, dto.email, passwordHash]
   );
 
+  if (dto.areas && dto.areas.length > 0) {
+    const placeholders = dto.areas.map((_, i) => `$${i + 1}`).join(', ');
+    const workAreas = await query<{ id: string; name: string }>(
+      `SELECT id, name FROM work_areas WHERE name IN (${placeholders})`,
+      dto.areas
+    );
+
+    if (workAreas.length > 0) {
+      const userAreasValues = workAreas.map((_, i) => `($1, $${i + 2})`).join(', ');
+      const queryParams = [user.id, ...workAreas.map((wa) => wa.id)];
+      await query(`INSERT INTO user_areas (user_id, work_area_id) VALUES ${userAreasValues}`, queryParams);
+      
+      user.areas = workAreas.map((wa) => wa.name);
+    }
+  }
+
   return user;
 }
 

@@ -36,6 +36,11 @@ const router = Router();
  *                 format: password
  *               name:
  *                 type: string
+ *               areas:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: List of work areas by name
  *     responses:
  *       201:
  *         description: User successfully registered
