@@ -6,6 +6,8 @@ import { env } from './config/env';
 import routes from './routes';
 import { errorHandler } from './middlewares/errorHandler';
 import { notFound } from './middlewares/notFound';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 
 export function createApp(): express.Application {
   const app = express();
@@ -21,6 +23,7 @@ export function createApp(): express.Application {
   app.get('/health', (_req, res) => {
     res.json({ status: 'ok', env: env.nodeEnv });
   });
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
   app.use('/api/v1', routes);
   app.use(notFound);
   app.use(errorHandler);
