@@ -1,3 +1,4 @@
+import bcrypt from 'bcrypt';
 import { query, queryOne } from '../database/pool';
 import { User, CreateUserDto, UpdateUserDto } from '../models/user.model';
 import { AppError } from '../middlewares/errorHandler';
@@ -28,11 +29,18 @@ export async function createUser(dto: CreateUserDto): Promise<User> {
     throw new AppError(`Email "${dto.email}" is already in use`, 409);
   }
 
+  if (!dto.password) {
+    throw new AppError('Password is required', 400);
+  }
+
+  const saltRounds = 10;
+  const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+
   const [user] = await query<User>(
-    `INSERT INTO users (name, email)
-     VALUES ($1, $2)
+    `INSERT INTO users (name, email, password_hash)
+     VALUES ($1, $2, $3)
      RETURNING id, name, email, created_at, updated_at`,
-    [dto.name, dto.email]
+    [dto.name, dto.email, passwordHash]
   );
 
   return user;
@@ -60,6 +68,13 @@ export async function updateUser(id: string, dto: UpdateUserDto): Promise<User> 
     }
     fields.push(`email = $${paramIndex++}`);
     values.push(dto.email);
+  }
+
+  if (dto.password) {
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(dto.password, saltRounds);
+    fields.push(`password_hash = $${paramIndex++}`);
+    values.push(passwordHash);
   }
 
   if (fields.length === 0) {

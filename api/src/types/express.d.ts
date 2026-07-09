@@ -1,4 +1,6 @@
 import { Request } from 'express';
+import { User } from '../models/user.model';
+import { Session } from '../models/session.model';
 
 export interface TypedRequest<
   TBody = unknown,
@@ -8,4 +10,13 @@ export interface TypedRequest<
   body: TBody;
   params: TParams;
   query: TQuery;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      user?: User;
+      session?: Session;
+    }
+  }
 }

@@ -10,6 +10,19 @@ const migrations: string[] = [
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
   `,
+  `
+  -- Add password_hash to users if it doesn't exist (handled by simply adding it for v2)
+  ALTER TABLE users ADD COLUMN password_hash VARCHAR(255) NOT NULL DEFAULT '';
+
+  -- Create sessions table
+  CREATE TABLE IF NOT EXISTS sessions (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    is_active   BOOLEAN NOT NULL DEFAULT true,
+    expires_at  TIMESTAMPTZ NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+  `,
 ];
 
 export async function runMigrations(): Promise<void> {
