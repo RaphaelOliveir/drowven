@@ -1,8 +1,6 @@
 import { request } from '../helpers/app';
 import { setupTestDatabase, clearTables, teardownTestDatabase } from '../helpers/db';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
 const BASE = '/api/v1/users';
 
 async function createUser(name: string, email: string) {
@@ -17,7 +15,6 @@ async function createUser(name: string, email: string) {
   };
 }
 
-// ─── Lifecycle ────────────────────────────────────────────────────────────────
 
 beforeAll(async () => {
   await setupTestDatabase();
@@ -31,7 +28,6 @@ afterAll(async () => {
   await teardownTestDatabase();
 });
 
-// ─── GET /users ───────────────────────────────────────────────────────────────
 
 describe('GET /api/v1/users', () => {
   it('returns an empty array when no users exist', async () => {
@@ -56,7 +52,6 @@ describe('GET /api/v1/users', () => {
   });
 });
 
-// ─── POST /users ──────────────────────────────────────────────────────────────
 
 describe('POST /api/v1/users', () => {
   it('creates a user and returns 201 with the new user', async () => {
@@ -93,7 +88,6 @@ describe('POST /api/v1/users', () => {
   });
 });
 
-// ─── GET /users/:id ───────────────────────────────────────────────────────────
 
 describe('GET /api/v1/users/:id', () => {
   it('returns the user by ID', async () => {
@@ -119,7 +113,6 @@ describe('GET /api/v1/users/:id', () => {
   });
 });
 
-// ─── PATCH /users/:id ─────────────────────────────────────────────────────────
 
 describe('PATCH /api/v1/users/:id', () => {
   it('updates the user name', async () => {
@@ -189,7 +182,6 @@ describe('PATCH /api/v1/users/:id', () => {
   it('does not update updated_at when nothing changes (same email allowed)', async () => {
     const created = await createUser('Alice', 'alice@example.com');
 
-    // Patching own email (no conflict with other users)
     const res = await request.patch(`${BASE}/${created.id}`).send({ email: 'alice@example.com' });
 
     expect(res.status).toBe(200);
@@ -197,7 +189,6 @@ describe('PATCH /api/v1/users/:id', () => {
   });
 });
 
-// ─── DELETE /users/:id ────────────────────────────────────────────────────────
 
 describe('DELETE /api/v1/users/:id', () => {
   it('deletes the user and returns 204', async () => {
@@ -206,7 +197,6 @@ describe('DELETE /api/v1/users/:id', () => {
     const deleteRes = await request.delete(`${BASE}/${created.id}`);
     expect(deleteRes.status).toBe(204);
 
-    // Confirm the user is gone
     const getRes = await request.get(`${BASE}/${created.id}`);
     expect(getRes.status).toBe(404);
   });
