@@ -9,3 +9,7 @@ process.env.DB_PORT = process.env.TEST_DB_PORT ?? '5432';
 process.env.DB_NAME = process.env.TEST_DB_NAME ?? 'drowven_test';
 process.env.DB_USER = process.env.TEST_DB_USER ?? 'drowven_user';
 process.env.DB_PASSWORD = process.env.TEST_DB_PASSWORD ?? 'drowven_password';
+process.env.CORS_ORIGIN = 'http://localhost:3001';
+process.env.RATE_LIMIT_WINDOW_MS = '60000';
+process.env.RATE_LIMIT_MAX = '1000';
+process.env.AUTH_RATE_LIMIT_MAX = '1000';

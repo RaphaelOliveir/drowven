@@ -13,6 +13,12 @@ function requireEnv(key: string): string {
 export const env = {
   nodeEnv: process.env.NODE_ENV ?? 'development',
   port: parseInt(process.env.PORT ?? '3000', 10),
+  corsOrigins: (process.env.CORS_ORIGIN ?? 'http://localhost:3001')
+    .split(',')
+    .map((o) => o.trim()),
+  rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? '60000', 10),
+  rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX ?? '100', 10),
+  authRateLimitMax: parseInt(process.env.AUTH_RATE_LIMIT_MAX ?? '10', 10),
   db: {
     host: requireEnv('DB_HOST'),
     port: parseInt(process.env.DB_PORT ?? '5432', 10),

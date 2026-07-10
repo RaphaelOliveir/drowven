@@ -5,6 +5,11 @@ import tsParser from '@typescript-eslint/parser';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 
+// Cast to any: tsPlugin.configs uses the legacy ClassicConfig shape (parser: string | null)
+// which is incompatible with the flat-config Plugin type (parser: string | undefined).
+// This is a known upstream type mismatch — runtime behaviour is unaffected.
+const tsPluginAny = /** @type {any} */ (tsPlugin);
+
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   // ─── Ignored paths ─────────────────────────────────────────────────────────
@@ -19,7 +24,7 @@ export default [
   {
     files: ['src/**/*.ts', 'jest.config.ts', 'jest.setup.ts'],
     plugins: {
-      '@typescript-eslint': tsPlugin,
+      '@typescript-eslint': tsPluginAny,
     },
     languageOptions: {
       parser: tsParser,
@@ -32,13 +37,13 @@ export default [
       },
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules,
+      ...tsPluginAny.configs.recommended.rules,
 
       // ── Strictness ──────────────────────────────────────────────────────────
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/explicit-function-return-type': [
         'warn',
@@ -68,7 +73,7 @@ export default [
   {
     files: ['tests/**/*.ts'],
     plugins: {
-      '@typescript-eslint': tsPlugin,
+      '@typescript-eslint': tsPluginAny,
     },
     languageOptions: {
       parser: tsParser,
@@ -82,7 +87,7 @@ export default [
       },
     },
     rules: {
-      ...tsPlugin.configs.recommended.rules,
+      ...tsPluginAny.configs.recommended.rules,
 
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': [

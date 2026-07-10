@@ -2,6 +2,7 @@ import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import jwt from 'jsonwebtoken';
 import * as conversationService from './services/conversation.service';
+import { env } from './config/env';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey_change_me_in_production';
 
@@ -12,7 +13,7 @@ interface JwtPayload {
 export function initSocketServer(server: HttpServer): void {
   const io = new Server(server, {
     cors: {
-      origin: '*',
+      origin: env.corsOrigins,
     },
   });
 
@@ -27,7 +28,7 @@ export function initSocketServer(server: HttpServer): void {
       const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
       socket.data.user = { id: decoded.userId };
       next();
-    } catch (err) {
+    } catch (_err) {
       return next(new Error('Authentication error'));
     }
   });
@@ -35,7 +36,7 @@ export function initSocketServer(server: HttpServer): void {
   io.on('connection', (socket: Socket) => {
     console.log(`[Socket] User connected: ${socket.data.user.id}`);
 
-    socket.join(socket.data.user.id);
+    void socket.join(socket.data.user.id);
 
     socket.on('sendMessage', async (payload: { conversationId: string; receiverId: string; content: string }) => {
       try {
