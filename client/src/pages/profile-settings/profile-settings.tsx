@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { AppDispatch, RootState } from '../../store';
-import { updateProfile } from '../../store/auth-slice';
+import { updateProfile, logoutUser } from '../../store/auth-slice';
 import { axiosInstance } from '../../api/axios-instance';
 import { Spinner } from '../../components/spinner/spinner';
 import './profile-settings.css';
@@ -50,6 +50,11 @@ export function ProfileSettings() {
     } else {
       setSaveMessage('Failed to update profile.');
     }
+  };
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate('/login');
   };
 
   return (
@@ -121,6 +126,17 @@ export function ProfileSettings() {
               {loading ? <Spinner /> : 'Save Settings'}
             </button>
           </form>
+
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid #333' }}>
+            <button 
+              type="button" 
+              onClick={handleLogout} 
+              className="logout-btn" 
+              disabled={loading}
+            >
+              Log Out
+            </button>
+          </div>
         </div>
       </div>
     </div>

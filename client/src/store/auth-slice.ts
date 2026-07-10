@@ -28,6 +28,21 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      await axiosInstance.post('/auth/logout');
+      localStorage.removeItem('token');
+      return true;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      localStorage.removeItem('token'); // always remove token on client side
+      return rejectWithValue(error.response?.data?.message || 'Logout failed');
+    }
+  }
+);
+
 export interface User {
   id: string;
   name: string;
@@ -143,6 +158,15 @@ const authSlice = createSlice({
         state.user = null;
         localStorage.removeItem('token');
         state.error = action.payload as string;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error = null;
+      })
+      .addCase(logoutUser.rejected, (state) => {
+        state.user = null;
+        state.isAuthenticated = false;
       });
   }
 });

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Bell, User } from 'lucide-react';
+import { Bell, User, X } from 'lucide-react';
 import { fetchUsers, fetchConversations, fetchMessages, sendMessage, setActiveConversation, createOrGetConversation, Conversation, fetchSuggestedUsers } from '../../store/chat-slice';
 import { AppDispatch, RootState } from '../../store';
 import { Spinner } from '../../components/spinner/spinner';
@@ -12,6 +12,7 @@ export function Home() {
   const navigate = useNavigate();
   const [msgInput, setMsgInput] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const user = useSelector((state: RootState) => state.auth.user);
   
   const { 
     users, 
@@ -66,13 +67,23 @@ export function Home() {
           <img src="/assets/images/wave.png" alt="Logo" className="header-logo" />
         </div>
         <div className="header-right">
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            className="search-input" 
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <input 
+              type="text" 
+              placeholder="Search..." 
+              className="search-input" 
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              style={{ paddingRight: searchInput ? '2rem' : '0.5rem' }}
+            />
+            {searchInput && (
+              <X 
+                size={16} 
+                style={{ position: 'absolute', right: '8px', cursor: 'pointer', color: 'var(--color-secondary)' }}
+                onClick={() => setSearchInput('')}
+              />
+            )}
+          </div>
           <div className="icon">
             <Bell data-testid="lucide-bell" size={20} />
           </div>
@@ -89,27 +100,32 @@ export function Home() {
             <Spinner />
           ) : (
             <ul className="conversation-list">
-              {conversations.map(c => (
-                <li key={c.id}>
-                  <button onClick={() => handleConversationClick(c)}>
-                    {c.receiver_name || 'Unknown User'}
-                  </button>
-                </li>
-              ))}
+              {conversations.map(c => {
+                const partnerName = c.sender_user_id === user?.id ? c.receiver_name : c.sender_name;
+                return (
+                  <li key={c.id}>
+                    <button onClick={() => handleConversationClick(c)}>
+                      {partnerName || 'Unknown User'}
+                    </button>
+                  </li>
+                );
+              })}
               {conversations.length === 0 && <p>No conversations yet.</p>}
             </ul>
           )}
         </aside>
         <main className="main-content">
-          {activeConversation ? (
+          {activeConversation ? (() => {
+            const activePartnerName = activeConversation.sender_user_id === user?.id ? activeConversation.receiver_name : activeConversation.sender_name;
+            return (
             <div data-testid="chat-window" className="chat-window">
-              <h2>Chat with {activeConversation.receiver_name || 'User'}</h2>
+              <h2>Chat with {activePartnerName || 'User'}</h2>
               <div className="chat-messages">
                 {loadingMessages ? (
                   <Spinner />
                 ) : (
                   messages.map(m => (
-                    <div key={m.id} className="message">
+                    <div key={m.id} className={`message ${m.sender_id === user?.id ? 'sent' : 'received'}`}>
                       <p>{m.content}</p>
                     </div>
                   ))
@@ -126,7 +142,8 @@ export function Home() {
                 <button onClick={handleSend}>Send</button>
               </div>
             </div>
-          ) : (
+            );
+          })() : (
             <div className="empty-state">Select a conversation to start chatting</div>
           )}
         </main>

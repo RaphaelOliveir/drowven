@@ -83,8 +83,20 @@ export const createOrGetConversation = createAsyncThunk(
 );
 
 export interface User { id: string; name: string; email?: string; }
-export interface Conversation { id: string; receiver_name?: string; [key: string]: unknown; }
-export interface Message { id: string; content: string; [key: string]: unknown; }
+export interface Conversation { 
+  id: string; 
+  sender_user_id: string;
+  receiver_user_id: string;
+  sender_name?: string;
+  receiver_name?: string; 
+  [key: string]: any; 
+}
+export interface Message { 
+  id: string; 
+  sender_id: string;
+  content: string; 
+  [key: string]: any; 
+}
 
 const initialState = {
   users: [] as User[],

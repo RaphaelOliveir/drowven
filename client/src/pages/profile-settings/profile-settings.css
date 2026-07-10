@@ -88,3 +88,28 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+.logout-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: transparent;
+  color: #ff4d4d;
+  border: 1px solid #ff4d4d;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logout-btn:hover:not(:disabled) {
+  background-color: rgba(255, 77, 77, 0.1);
+}
+
+.logout-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
