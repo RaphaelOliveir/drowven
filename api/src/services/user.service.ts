@@ -3,10 +3,32 @@ import { query, queryOne } from '../database/pool';
 import { User, CreateUserDto, UpdateUserDto } from '../models/user.model';
 import { AppError } from '../middlewares/errorHandler';
 
-export async function findAllUsers(): Promise<User[]> {
-  return query<User>(
-    'SELECT id, name, email, created_at, updated_at FROM users ORDER BY created_at DESC'
-  );
+export async function findAllUsers(filters?: { search?: string; workArea?: string }): Promise<User[]> {
+  let queryStr = 'SELECT u.id, u.name, u.email, u.created_at, u.updated_at FROM users u';
+  const queryParams: any[] = [];
+  const conditions: string[] = [];
+
+  if (filters?.workArea) {
+    queryStr += `
+      JOIN user_areas ua ON u.id = ua.user_id
+      JOIN work_areas wa ON ua.work_area_id = wa.id
+    `;
+    queryParams.push(filters.workArea);
+    conditions.push(`wa.name = $${queryParams.length}`);
+  }
+
+  if (filters?.search) {
+    queryParams.push(`%${filters.search}%`);
+    conditions.push(`(u.name ILIKE $${queryParams.length} OR u.email ILIKE $${queryParams.length})`);
+  }
+
+  if (conditions.length > 0) {
+    queryStr += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  queryStr += ' ORDER BY u.created_at DESC';
+
+  return query<User>(queryStr, queryParams);
 }
 
 export async function findUserById(id: string): Promise<User> {

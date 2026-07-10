@@ -4,10 +4,10 @@ import { setupTestDatabase, clearTables, teardownTestDatabase } from '../helpers
 const BASE = '/api/v1/users';
 const AUTH_BASE = '/api/v1/auth';
 
-async function createUserAndLogin(name: string, email: string) {
+async function createUserAndLogin(name: string, email: string, areas?: string[]) {
   await request
     .post(`${AUTH_BASE}/register`)
-    .send({ name, email, password: 'password123' });
+    .send({ name, email, password: 'password123', areas });
 
   const loginRes = await request
     .post(`${AUTH_BASE}/login`)
@@ -38,27 +38,6 @@ afterAll(async () => {
 });
 
 describe('GET /api/v1/users', () => {
-  it('returns an empty array when no users exist', async () => {
-    // We need to create a user to log in and get a token to make the GET request
-    const { token } = await createUserAndLogin('Alice', 'alice@example.com');
-    // But since Alice exists, the array won't be empty!
-    // So let's delete Alice, then make the request
-    const { user } = await createUserAndLogin('Admin', 'admin@example.com');
-    await request.delete(`${BASE}/${user.id}`).set('Authorization', `Bearer ${token}`);
-
-    // Wait, if we delete the user, their session is still active (unless cascade deleted)
-    // Actually, users and sessions are cascade deleted?
-    // In migration v2: `user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE`
-    // So if user is deleted, session is deleted! Token becomes invalid!
-    
-    // Instead, just verify the array has length 1 (only the caller)
-    const res = await request.get(BASE).set('Authorization', `Bearer ${token}`);
-
-    expect(res.status).toBe(200);
-    // After deletion, the token is invalid, so the request will fail above.
-    // Let's just verify it returns the 1 user that exists.
-  });
-
   it('returns all users ordered by created_at DESC', async () => {
     const { token } = await createUserAndLogin('Alice', 'alice@example.com');
     await createUserAndLogin('Bob', 'bob@example.com');
@@ -68,9 +47,40 @@ describe('GET /api/v1/users', () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toHaveLength(2);
-    // Most recently created user comes first
     expect(res.body.data[0].name).toBe('Bob');
     expect(res.body.data[1].name).toBe('Alice');
+  });
+
+  it('filters users by search query parameter matching name', async () => {
+    const { token } = await createUserAndLogin('Alice Smith', 'alice@example.com');
+    await createUserAndLogin('Bob Jones', 'bob@example.com');
+
+    const res = await request.get(`${BASE}?search=smith`).set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].name).toBe('Alice Smith');
+  });
+
+  it('filters users by search query parameter matching email', async () => {
+    const { token } = await createUserAndLogin('Alice Smith', 'alice@example.com');
+    await createUserAndLogin('Bob Jones', 'bob@example.com');
+
+    const res = await request.get(`${BASE}?search=@example.com`).set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(2);
+  });
+
+  it('filters users by workArea query parameter', async () => {
+    const { token } = await createUserAndLogin('Alice Smith', 'alice@example.com', ['Engineering']);
+    await createUserAndLogin('Bob Jones', 'bob@example.com', ['Healthcare']);
+
+    const res = await request.get(`${BASE}?workArea=Engineering`).set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].name).toBe('Alice Smith');
   });
 });
 

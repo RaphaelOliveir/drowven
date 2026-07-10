@@ -2,9 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import * as userService from '../services/user.service';
 import { sendSuccess, sendCreated, sendNoContent } from '../utils/response';
 
-export async function listUsers(_req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function listUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const users = await userService.findAllUsers();
+    const { search, workArea } = req.query;
+    const users = await userService.findAllUsers({
+      search: search as string,
+      workArea: workArea as string,
+    });
     sendSuccess(res, users);
   } catch (err) {
     next(err);

@@ -54,6 +54,29 @@ const migrations: string[] = [
     ('Artificial Intelligence'), ('Aerospace'), ('Maritime'), ('Utilities'), ('Waste Management')
   ON CONFLICT (name) DO NOTHING;
   `,
+  `
+  CREATE TABLE IF NOT EXISTS conversations (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    sender_user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    receiver_user_id  UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status            VARCHAR(50) NOT NULL DEFAULT 'active',
+    last_message_at   TIMESTAMPTZ,
+    last_message_id   UUID,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(sender_user_id, receiver_user_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS messages (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id   UUID NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id         UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    content           TEXT NOT NULL,
+    read_at           TIMESTAMPTZ,
+    created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  );
+  `
 ];
 
 export async function runMigrations(): Promise<void> {

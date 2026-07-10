@@ -2,6 +2,7 @@ import { createApp } from './app';
 import { env } from './config/env';
 import { runMigrations } from './database/migrate';
 import { closePool } from './database/pool';
+import { initSocketServer } from './socket';
 
 async function main(): Promise<void> {
   await runMigrations();
@@ -11,6 +12,8 @@ async function main(): Promise<void> {
   const server = app.listen(env.port, () => {
     console.log(`[Server] Running on port ${env.port} in ${env.nodeEnv} mode`);
   });
+
+  initSocketServer(server);
 
   const shutdown = async (signal: string): Promise<void> => {
     console.log(`\n[Server] Received ${signal}, shutting down gracefully...`);
