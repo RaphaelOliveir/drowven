@@ -3,9 +3,23 @@ import { axiosInstance } from '../api/axios-instance';
 
 export const fetchUsers = createAsyncThunk(
   'chat/fetchUsers',
+  async (query: { search?: string } = {}, { rejectWithValue }) => {
+    try {
+      const qs = query?.search ? `?search=${encodeURIComponent(query.search)}` : '';
+      const response = await axiosInstance.get(`/users${qs}`);
+      return response.data;
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(error.response?.data?.message || 'Failed request');
+    }
+  }
+);
+
+export const fetchSuggestedUsers = createAsyncThunk(
+  'chat/fetchSuggestedUsers',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('/users');
+      const response = await axiosInstance.get('/users/suggested');
       return response.data;
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
@@ -100,6 +114,15 @@ const chatSlice = createSlice({
         state.users = action.payload;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
+        state.loadingUsers = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchSuggestedUsers.pending, (state) => { state.loadingUsers = true; })
+      .addCase(fetchSuggestedUsers.fulfilled, (state, action) => {
+        state.loadingUsers = false;
+        state.users = action.payload;
+      })
+      .addCase(fetchSuggestedUsers.rejected, (state, action) => {
         state.loadingUsers = false;
         state.error = action.payload as string;
       })

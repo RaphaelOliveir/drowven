@@ -1,0 +1,90 @@
+.profile-settings-page {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 3rem 1rem;
+  overflow-y: auto;
+}
+
+.profile-settings-card {
+  background: var(--color-primary);
+  padding: 2rem;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+  border: 1px solid var(--color-ternary);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.profile-settings-card h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  color: var(--color-ternary);
+}
+
+.save-message {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: rgba(40, 167, 69, 0.2);
+  color: #28a745;
+  border: 1px solid #28a745;
+  border-radius: 4px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--color-secondary);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--color-secondary);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--color-ternary);
+}
+
+.form-control option {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
+.save-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--color-ternary);
+  color: var(--color-primary);
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.save-btn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.save-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

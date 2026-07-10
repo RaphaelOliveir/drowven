@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Bell, User } from 'lucide-react';
-import { fetchUsers, fetchConversations, fetchMessages, sendMessage, setActiveConversation, createOrGetConversation, Conversation } from '../../store/chat-slice';
+import { fetchUsers, fetchConversations, fetchMessages, sendMessage, setActiveConversation, createOrGetConversation, Conversation, fetchSuggestedUsers } from '../../store/chat-slice';
 import { AppDispatch, RootState } from '../../store';
 import { Spinner } from '../../components/spinner/spinner';
+import { useNavigate } from 'react-router-dom';
 import './home.css';
 
 export function Home() {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const [msgInput, setMsgInput] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   
   const { 
     users, 
@@ -21,9 +24,20 @@ export function Home() {
   } = useSelector((state: RootState) => state.chat);
 
   useEffect(() => {
-    dispatch(fetchUsers());
+    dispatch(fetchSuggestedUsers());
     dispatch(fetchConversations());
   }, [dispatch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput) {
+        dispatch(fetchUsers({ search: searchInput }));
+      } else {
+        dispatch(fetchSuggestedUsers());
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput, dispatch]);
 
   const handleConversationClick = (conv: Conversation) => {
     dispatch(setActiveConversation(conv));
@@ -52,15 +66,22 @@ export function Home() {
           <img src="/assets/images/wave.png" alt="Logo" className="header-logo" />
         </div>
         <div className="header-right">
-          <input type="text" placeholder="Search..." className="search-input" />
+          <input 
+            type="text" 
+            placeholder="Search..." 
+            className="search-input" 
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
           <div className="icon">
             <Bell data-testid="lucide-bell" size={20} />
           </div>
-          <div className="icon">
+          <div className="icon" onClick={() => navigate('/settings')} style={{ cursor: 'pointer' }}>
             <User data-testid="lucide-user" size={20} />
           </div>
         </div>
       </header>
+      
       <div className="home-body">
         <aside className="sidebar-left">
           <h2>Conversations</h2>
@@ -110,7 +131,7 @@ export function Home() {
           )}
         </main>
         <aside className="sidebar-right">
-          <h2>Suggested Users</h2>
+          <h2>{searchInput ? 'Search Results' : 'Suggested Users'}</h2>
           {loadingUsers ? (
             <Spinner />
           ) : (

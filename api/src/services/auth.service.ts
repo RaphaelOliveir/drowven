@@ -4,6 +4,7 @@ import { query, queryOne } from '../database/pool';
 import { User } from '../models/user.model';
 import { Session } from '../models/session.model';
 import { AppError } from '../middlewares/errorHandler';
+import { findUserById } from './user.service';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey_change_me_in_production';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '5d';
@@ -27,12 +28,12 @@ export async function login(dto: LoginDto): Promise<{ user: User; token: string 
     throw new AppError('Invalid email or password', 401);
   }
 
-  const { password_hash, ...user } = userRecord;
-
-  const isValidPassword = await bcrypt.compare(dto.password, password_hash);
+  const isValidPassword = await bcrypt.compare(dto.password, userRecord.password_hash);
   if (!isValidPassword) {
     throw new AppError('Invalid email or password', 401);
   }
+
+  const user = await findUserById(userRecord.id);
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 5);
@@ -68,14 +69,7 @@ export async function verifySession(sessionId: string): Promise<{ session: Sessi
     throw new AppError('Session is invalid or expired', 401);
   }
 
-  const user = await queryOne<User>(
-    'SELECT id, name, email, created_at, updated_at FROM users WHERE id = $1',
-    [session.user_id]
-  );
-
-  if (!user) {
-    throw new AppError('User not found', 401);
-  }
+  const user = await findUserById(session.user_id);
 
   return { session, user };
 }

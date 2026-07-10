@@ -62,3 +62,22 @@ export async function deleteUser(
     next(err);
   }
 }
+
+export async function getSuggestedUsers(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+    const users = await userService.findSuggestedUsers(userId);
+    sendSuccess(res, users);
+  } catch (err) {
+    next(err);
+  }
+}
+

@@ -76,6 +76,12 @@ const migrations: string[] = [
     created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
   );
+  `,
+  `
+  ALTER TABLE users 
+  ADD COLUMN IF NOT EXISTS description TEXT,
+  ADD COLUMN IF NOT EXISTS projects TEXT,
+  ADD COLUMN IF NOT EXISTS experience TEXT;
   `
 ];
 

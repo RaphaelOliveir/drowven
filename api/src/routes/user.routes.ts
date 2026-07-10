@@ -52,6 +52,28 @@ router.get('/', userController.listUsers);
 
 /**
  * @swagger
+ * /api/v1/users/suggested:
+ *   get:
+ *     summary: Get suggested users (who share a work area)
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of suggested users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Unauthorized
+ */
+router.get('/suggested', userController.getSuggestedUsers);
+
+/**
+ * @swagger
  * /api/v1/users/{id}:
  *   get:
  *     summary: Get a user by ID
