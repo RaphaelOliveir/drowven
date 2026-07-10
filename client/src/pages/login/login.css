@@ -1,0 +1,107 @@
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
+.login-branding {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border-right: 2px solid var(--color-ternary);
+}
+
+.login-logo {
+  max-width: 200px;
+  margin-bottom: 2rem;
+}
+
+.login-branding h1 {
+  font-family: 'Press Start 2P', cursive;
+  color: var(--color-ternary);
+  font-size: 2rem;
+}
+
+.login-form-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  max-width: 400px;
+  gap: 1.5rem;
+}
+
+.login-form h2 {
+  text-align: center;
+  color: var(--color-ternary);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group input {
+  padding: 1rem;
+  background-color: transparent;
+  border: 1px solid var(--color-secondary);
+  color: var(--color-secondary);
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: var(--color-ternary);
+}
+
+.error-text {
+  color: #ff4d4d;
+  font-size: 0.7rem;
+  margin-top: 0.3rem;
+}
+
+.global-error {
+  text-align: center;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.auth-redirect {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.7rem;
+}
+
+.auth-redirect a {
+  color: var(--color-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.auth-redirect a:hover {
+  color: var(--color-ternary);
+}
+
+button {
+  padding: 1rem;
+  background-color: var(--color-ternary);
+  color: var(--color-primary);
+  border: none;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.8;
+}

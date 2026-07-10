@@ -1,0 +1,34 @@
+:root {
+  --color-primary: #1A1A1A;
+  --color-secondary: #E2E2E2;
+  --color-ternary: #F6B904;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  font-family: 'Press Start 2P', cursive;
+  box-sizing: border-box;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+* {
+  box-sizing: inherit;
+}
+
+a {
+  color: var(--color-ternary);
+  text-decoration: none;
+}
+
+button {
+  font-family: 'Press Start 2P', cursive;
+  cursor: pointer;
+}
+
+input {
+  font-family: 'Press Start 2P', cursive;
+}
